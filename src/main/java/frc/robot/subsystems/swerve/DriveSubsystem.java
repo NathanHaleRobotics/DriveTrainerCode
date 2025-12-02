@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -18,6 +19,7 @@ public class DriveSubsystem extends SubsystemBase{
     private Module[] modules;
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(FL_POS, FR_POS, BL_POS, BR_POS);
     private ChassisSpeeds targetSpeed = new ChassisSpeeds(0, 0, 0);
+    private Pigeon2 bird = new Pigeon2(30);
 
     public DriveSubsystem(Module... mods){
         this.modules = mods;
@@ -25,12 +27,13 @@ public class DriveSubsystem extends SubsystemBase{
 
     @Override
     public void periodic(){
-        SwerveModuleState[] s = kinematics.toSwerveModuleStates(targetSpeed);
+        SwerveModuleState[] s = kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(targetSpeed, bird.getRotation2d()));
         modules[0].setState(s[0]);
         modules[1].setState(s[1]);
         modules[2].setState(s[2]);
         modules[3].setState(s[3]);
         Logger.recordOutput("drive/setStates", s);
+        Logger.recordOutput("drive/angle", bird.getRotation2d());
         for(Module m : modules){
             m.periodic();
         }
@@ -38,5 +41,8 @@ public class DriveSubsystem extends SubsystemBase{
 
     public void drive(ChassisSpeeds s){
         targetSpeed = s;
+    }
+    public void zero(){
+        bird.reset();
     }
 }

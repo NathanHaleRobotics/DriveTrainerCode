@@ -10,6 +10,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.swerve.DriveSubsystem;
 import frc.robot.subsystems.swerve.Module;
 
@@ -32,7 +34,11 @@ public class RobotContainer {
     configureBindings();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    new Trigger(() -> xboxCon1.getAButton()).onTrue(new InstantCommand(() -> {
+      drive.zero();
+    }));
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");

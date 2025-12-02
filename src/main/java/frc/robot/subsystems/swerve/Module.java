@@ -127,6 +127,7 @@ public class Module {
     }
     public void setState(SwerveModuleState state){
         state.optimize(new Rotation2d(steer.getAbsoluteEncoder().getPosition() - Math.PI));
+        state.cosineScale(new Rotation2d(steer.getAbsoluteEncoder().getPosition() - Math.PI));
         setSteerPoint(state.angle.getRadians());
         setDrivePoint(state.speedMetersPerSecond/Units.inchesToMeters(2));
     }
