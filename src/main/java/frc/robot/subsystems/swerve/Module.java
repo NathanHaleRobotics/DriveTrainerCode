@@ -17,9 +17,11 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 public class Module {
@@ -29,10 +31,12 @@ public class Module {
 
     private double steerSet = 0;
     private double driveSet = 0;
-
-    private PIDController steerPID = new PIDController(4.5, 0, 0.07);
+    //4.5 0 0.07
+    private ProfiledPIDController steerPID = new ProfiledPIDController(0, 0, 0.0, new Constraints(1, 1));
     private PIDController drivePID = new PIDController(0, 0, 0.0);
-    private SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0, 1/6.75);
+    private SimpleMotorFeedforward steerFF = new SimpleMotorFeedforward(0.105, 0.2);
+    // 0 1/6.75
+    private SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0, 0);
 
     
 
@@ -106,14 +110,16 @@ public class Module {
         double pos = steer.getAbsoluteEncoder().getPosition() - Math.PI;
         double vel = drive.getEncoder().getVelocity();
         Logger.recordOutput("subsystems/drive/"+steer.getDeviceId()+"/position", pos);
-        Logger.recordOutput("subsystems/drive"+steer.getDeviceId()+"/positionSet", steerSet);
+        Logger.recordOutput("subsystems/drive"+steer.getDeviceId()+"/positionGoal", steerSet);
+        Logger.recordOutput("subsystems/drive"+steer.getDeviceId()+"/positionSet", steerPID.getSetpoint().position);
         Logger.recordOutput("subsystems/drive/"+steer.getDeviceId()+"/speed", vel);
-        Logger.recordOutput("subsystems/drive/"+steer.getDeviceId()+"/speedSet", -driveSet);
+        Logger.recordOutput("subsystems/drive/"+steer.getDeviceId()+"/speedGoal", -driveSet);
         
-        double goSteer = steerPID.calculate(pos, steerSet);
+        double goSteer = steerPID.calculate(pos, steerSet) + steerFF.calculate(steerPID.getSetpoint().velocity);
         double goDrive = drivePID.calculate(vel, -driveSet) + driveFF.calculate(-driveSet);
         Logger.recordOutput("subsystems/drive/"+steer.getDeviceId()+"/PIDOuts", goSteer);
         Logger.recordOutput("subsystems/drive/"+steer.getDeviceId()+"/PIDOutd", goDrive);
+        
         
         steer.setVoltage(goSteer);
         drive.setVoltage(goDrive);
@@ -125,8 +131,12 @@ public class Module {
     public void setDrivePoint(double point){
         driveSet = point;
     }
+    public double getPos(){
+        return steer.getAbsoluteEncoder().getPosition() - Math.PI;
+    }
+
     public void setState(SwerveModuleState state){
-        state.optimize(new Rotation2d(steer.getAbsoluteEncoder().getPosition() - Math.PI));
+        //state.optimize(new Rotation2d(steer.getAbsoluteEncoder().getPosition() - Math.PI));
         state.cosineScale(new Rotation2d(steer.getAbsoluteEncoder().getPosition() - Math.PI));
         setSteerPoint(state.angle.getRadians());
         setDrivePoint(state.speedMetersPerSecond/Units.inchesToMeters(2));
