@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.swerve.DriveSubsystem;
 import frc.robot.subsystems.swerve.Module;
+import frc.robot.subsystems.swerve.ModuleIOSpark;
 
 import static frc.robot.constants.Constants.*;
 
@@ -25,10 +26,10 @@ public class RobotContainer {
   public RobotContainer() {
 
     drive = new DriveSubsystem(
-      new Module(21, 11),
-      new Module(22, 12),
-      new Module(23, 13),
-      new Module(24, 14)
+      new Module(new ModuleIOSpark(21, 11)),
+      new Module(new ModuleIOSpark(22, 12)),
+      new Module(new ModuleIOSpark(23, 13)),
+      new Module(new ModuleIOSpark(24, 14))
     );
     
     configureBindings();
