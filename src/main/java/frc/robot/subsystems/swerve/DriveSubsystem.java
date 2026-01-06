@@ -3,11 +3,6 @@ package frc.robot.subsystems.swerve;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -37,7 +32,7 @@ public class DriveSubsystem extends SubsystemBase{
         Logger.recordOutput("drive/angle", bird.getRotation2d());
         if (DriverStation.isDisabled()) {
             for (Module m  : modules){
-                m.setSteerPoint(m.getPos());
+                m.setSteerPoint(m.getSteerPos());
             }
         }
         for(Module m : modules){

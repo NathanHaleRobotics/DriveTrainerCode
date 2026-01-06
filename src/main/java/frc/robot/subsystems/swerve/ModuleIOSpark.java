@@ -116,10 +116,10 @@ public class ModuleIOSpark implements ModuleIO{
         in.steerTemperature = steer.getMotorTemperature();
         
         in.driveVel = vel;
+        in.drivePos = drive.getEncoder().getPosition();
         in.driveAppliedVolts = drive.getAppliedOutput()*drive.getBusVoltage();
         in.driveCurrent = drive.getOutputCurrent();
         in.driveTemperature = drive.getMotorTemperature();
-
         Logger.recordOutput("subsystems/drive/"+steer.getDeviceId()+"/positionSet", steerPID.getSetpoint().position);
         
         double goSteer = steerPID.calculate(pos, steerSet) + steerFF.calculate(steerPID.getSetpoint().velocity);

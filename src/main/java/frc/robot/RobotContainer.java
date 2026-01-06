@@ -18,10 +18,16 @@ import frc.robot.subsystems.swerve.ModuleIOSpark;
 
 import static frc.robot.constants.Constants.*;
 
+import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix6.hardware.CANrange;
+
 public class RobotContainer {
 
   private DriveSubsystem drive;
   private XboxController xboxCon1 = new XboxController(0);
+
+  private CANrange range = new CANrange(31);
 
   public RobotContainer() {
 
@@ -39,6 +45,7 @@ public class RobotContainer {
     new Trigger(() -> xboxCon1.getAButton()).onTrue(new InstantCommand(() -> {
       drive.zero();
     }));
+
   }
 
   public Command getAutonomousCommand() {
@@ -55,5 +62,12 @@ public class RobotContainer {
     } else {
       drive.drive(new ChassisSpeeds());
     }
+
+    if(range.getIsDetected().getValue()){
+      Logger.recordOutput("see?", "I SEE");
+    } else {
+      Logger.recordOutput("see?", "I DONT SEE");
+    }
+    Logger.recordOutput("see2?", range.getDistance().getValueAsDouble());
   }
 }

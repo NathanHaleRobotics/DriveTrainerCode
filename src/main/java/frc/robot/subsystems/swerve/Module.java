@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 
@@ -31,8 +32,11 @@ public class Module {
         Logger.recordOutput("subsystems/drive/"+mod.getID()+"/speedGoal", point);
         mod.setDriveVel(point);
     }
-    public double getPos(){
-        return inputs.driveVel;
+    public double getSteerPos(){
+        return inputs.steerPos;
+    }
+    public SwerveModulePosition getPosition(){
+        return new SwerveModulePosition(inputs.drivePos , new Rotation2d(inputs.steerPos));
     }
 
     public void setState(SwerveModuleState state){
