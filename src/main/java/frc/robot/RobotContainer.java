@@ -12,6 +12,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.swerve.DriveSubsystem;
 import frc.robot.subsystems.swerve.Module;
 import frc.robot.subsystems.swerve.ModuleIOSpark;
@@ -25,6 +29,7 @@ import com.ctre.phoenix6.hardware.CANrange;
 public class RobotContainer {
 
   private DriveSubsystem drive;
+  private Intake intake;
   private XboxController xboxCon1 = new XboxController(0);
 
   private CANrange range = new CANrange(31);
@@ -37,6 +42,12 @@ public class RobotContainer {
       new Module(new ModuleIOSpark(23, 13)),
       new Module(new ModuleIOSpark(24, 14))
     );
+
+    if (RobotBase.isReal()) {
+      intake = new Intake(new IntakeIOSparkMax(1, 2, 3));
+    } else {
+      intake = new Intake(new IntakeIOSim());
+    }
     
     configureBindings();
   }
@@ -46,6 +57,13 @@ public class RobotContainer {
       drive.zero();
     }));
 
+    // Intake on Right Trigger
+    new Trigger(() -> xboxCon1.getRightTriggerAxis() > 0.5)
+        .whileTrue(intake.intake());
+
+    // Outtake on Left Trigger
+    new Trigger(() -> xboxCon1.getLeftTriggerAxis() > 0.5)
+        .whileTrue(intake.outtake());
   }
 
   public Command getAutonomousCommand() {

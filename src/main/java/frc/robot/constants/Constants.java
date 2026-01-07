@@ -11,4 +11,7 @@ public class Constants {
 
     public static final double MAX_LINEAR_SPEED = 3;
     public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED/Math.hypot(Units.inchesToMeters(11), Units.inchesToMeters(12.5));
+
+    public static final double INTAKE_VOLTS = 5.0;
+    public static final double INTAKE_VOLTS_LOWER = 3.0;
 }
